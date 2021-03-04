@@ -6,6 +6,13 @@ namespace RhythmsGonnaGetYou
 {
     class Program
     {
+
+        static void MenuGreeting(string message)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"Welcome to the {message}");
+            Console.WriteLine(("").PadRight(55, '-'));
+        }
         static void Main(string[] args)
         {
             var db = new RhythmContext();
@@ -26,16 +33,54 @@ namespace RhythmsGonnaGetYou
                         isRunning = false;
                         break;
 
+                    case 1:
+                        AddBand();
+                        bands.Add(newBand);
+                        break;
+
+                    case 2:
+                        ViewBands();
+                        break;
+
+                    case 3:
+                        AddAlbum();
+                        break;
+
+                    case 4:
+                        AddSong();
+                        break;
+
+                    case 5:
+                        CutBand();
+                        break;
+
+                    case 6:
+                        ResignBand();
+                        break;
+
+                    case 7:
+                        ViewAlbums();
+                        break;
+
+                    case 8:
+                        ViewAllAlbums();
+                        break;
+
+                    case 9:
+                        ViewBandsSigned();
+                        break;
+
+                    case 10:
+                        ViewCutBands();
+                        break;
+
+                    default:
+                        Console.WriteLine(" Sorry, that is not a valid option.");
+                        break;
 
                 }
             }
 
-        }
-        static void MenuGreeting(string message)
-        {
-            Console.WriteLine();
-            Console.WriteLine($"Welcome to the {message}");
-            Console.WriteLine(("").PadRight(55, '-'));
         }
         static int MenuPrompt(string prompt)
         {
@@ -60,6 +105,47 @@ namespace RhythmsGonnaGetYou
                 input = Console.ReadLine();
             } while (!int.TryParse(input, out value));
             return value;
+        }
+
+        static void AddBand()
+        {
+            MenuGreeting("Adding a new Band. Please enter the following information about this new Band:");
+            Console.WriteLine("Band's Name:");
+            var newBandName = Console.ReadLine();
+
+            Console.WriteLine("Band's country of origin:");
+            var newCountry = Console.ReadLine();
+
+            Console.WriteLine("Number of members:");
+            var newNumberOfMembers = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Band's website:");
+            var newBandWebsite = Console.ReadLine();
+
+            Console.WriteLine("Band's Genre:");
+            var newGenre = Console.ReadLine();
+
+            Console.WriteLine("Is this Band signed to the Label? (true or false)");
+            var newSigned = bool.Parse(Console.ReadLine());
+
+            Console.WriteLine("Name of Band's contact:");
+            var newContact = Console.ReadLine();
+
+            Console.WriteLine("Band's contact phone number:");
+            var newContactNumber = Console.ReadLine();
+
+            var newBand = new Band()
+            {
+                Name = newBandName,
+                CountryOfOrigin = newCountry,
+                NumberOfMembers = newNumberOfMembers,
+                Website = newBandWebsite,
+                Genre = newGenre,
+                IsSigned = newSigned,
+                ContactName = newContact,
+                ContactPhoneNumber = newContactNumber,
+            };
+
         }
     }
 }
