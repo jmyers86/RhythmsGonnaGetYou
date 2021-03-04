@@ -11,8 +11,24 @@ namespace RhythmsGonnaGetYou
             var db = new RhythmContext();
             var bands = db.Bands;
 
-            MenuGreeting("Main Menu.");
-            MenuPrompt("Please make a selection from below:");
+            var isRunning = true;
+            while (isRunning)
+            {
+
+                MenuGreeting("Main Menu.");
+
+                var selection = MenuPrompt("Please make a selection from below:");
+
+                switch (selection)
+                {
+                    case 0:
+                        Console.WriteLine("Goodbye.");
+                        isRunning = false;
+                        break;
+
+
+                }
+            }
 
         }
         static void MenuGreeting(string message)
@@ -35,7 +51,7 @@ namespace RhythmsGonnaGetYou
             Console.WriteLine("8) View all Albums in the Database (ordered by release date)");
             Console.WriteLine("9) View all Bands that are signed to the Label");
             Console.WriteLine("10) View all Bands that are NOT signed to the Label");
-            Console.WriteLine("Type (Q)uit to Exit the program.");
+            Console.WriteLine("Type 0 to Exit the program.");
             string input;
             int value;
             do
