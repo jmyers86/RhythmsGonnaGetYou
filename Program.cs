@@ -70,39 +70,35 @@ namespace RhythmsGonnaGetYou
                     {
                         Console.WriteLine($"{album.Title}");
                     }
+
                     var selection = BandMenuPrompt("Please make a selection from below:");
                     switch (selection)
                     {
                         case 0:
-                            MenuGreeting("Main Menu");
-                            MainMenuPrompt("Please make a selection from below:");
                             break;
-
+                        // I want to return to the main menu when pressing a certain key.
+                        // I tried adding "selectedBand = null;"  and several other things.
+                        // I can't get the WaitForKeyOrGoBack method to work here either.
                         case 1:
                             AddAlbum();
                             break;
 
-                        case 2:
-                            AddSong();
-                            break;
+                        // case 2:
+                        //     AddSong();
+                        //     break;
 
-                        case 3:
-                            CutBand();
-                            break;
+                        // case 3:
+                        //     CutBand();
+                        //     break;
 
-                        case 4:
-                            ResignBand();
-                            break;
+                        // case 4:
+                        //     ResignBand();
+                        //     break;
 
                         default:
                             Console.WriteLine(" Sorry, that is not a valid option.");
                             break;
                     }
-                    // TODO: Handle these options:
-                    //   AddAlbum();
-                    //   AddSong();
-                    //   CutBand();
-                    //   ResignBand();
 
                     if (WaitForKeyOrGoBack())
                     {
@@ -180,7 +176,7 @@ namespace RhythmsGonnaGetYou
             {
                 var bandNameQuery = PromptForString("Band name to search for:");
 
-                // set selectBand by querying the DB for the band.
+                // The way this is written only allows fully lower-case queries.
                 selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery));
 
                 if (selectedBand == null)
