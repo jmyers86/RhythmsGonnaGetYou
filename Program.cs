@@ -1,101 +1,88 @@
 ﻿using System;
 using System.Linq;
 using RhythmsGonnaGetYou.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace RhythmsGonnaGetYou
 {
     class Program
     {
-
+        static RhythmContext db = new RhythmContext();
+        static Band selectedBand = null;
         static void MenuGreeting(string message)
         {
             Console.WriteLine();
+            Console.Clear();
             Console.WriteLine($"Welcome to the {message}");
             Console.WriteLine(("").PadRight(55, '-'));
+            Console.WriteLine();
         }
         static void Main(string[] args)
         {
-            var db = new RhythmContext();
-            var bands = db.Bands;
-
             var isRunning = true;
             while (isRunning)
             {
-
-                MenuGreeting("Main Menu.");
-
-                var selection = MenuPrompt("Please make a selection from below:");
-
-                switch (selection)
+                if (selectedBand == null)
                 {
-                    case 0:
-                        Console.WriteLine("Goodbye.");
-                        isRunning = false;
-                        break;
+                    MenuGreeting("Main Menu.");
+                    var selection = MainMenuPrompt("Please make a selection from below:");
+                    switch (selection)
+                    {
+                        case 0:
+                            Console.WriteLine("Goodbye.");
+                            isRunning = false;
+                            break;
 
-                    case 1:
-                        AddBand();
-                        bands.Add(newBand);
-                        break;
+                        case 1:
+                            AddBand();
+                            break;
 
-                    case 2:
-                        ViewBands();
-                        break;
+                        case 2:
+                            SelectBand();
+                            break;
 
-                    case 3:
-                        AddAlbum();
-                        break;
+                        case 3:
+                            ViewBands();
+                            break;
 
-                    case 4:
-                        AddSong();
-                        break;
+                        // TODO: Handle 4, 5, and 6
 
-                    case 5:
-                        CutBand();
-                        break;
+                        default:
+                            Console.WriteLine(" Sorry, that is not a valid option.");
+                            break;
+                    }
+                }
+                else
+                {
+                    MenuGreeting($"Band Menu: {selectedBand.Name}");
+                    foreach (Album album in selectedBand.Albums)
+                    {
+                        Console.WriteLine($"{album.Title}");
+                    }
+                    Console.WriteLine();
 
-                    case 6:
-                        ResignBand();
-                        break;
+                    // TODO: Handle these options:
+                    //   AddAlbum();
+                    //   AddSong();
+                    //   CutBand();
+                    //   ResignBand();
 
-                    case 7:
-                        ViewAlbums();
-                        break;
-
-                    case 8:
-                        ViewAllAlbums();
-                        break;
-
-                    case 9:
-                        ViewBandsSigned();
-                        break;
-
-                    case 10:
-                        ViewCutBands();
-                        break;
-
-                    default:
-                        Console.WriteLine(" Sorry, that is not a valid option.");
-                        break;
-
+                    if (WaitForKeyOrGoBack())
+                    {
+                        selectedBand = null;
+                    }
                 }
             }
-
         }
-        static int MenuPrompt(string prompt)
+        static int MainMenuPrompt(string prompt)
         {
-            Console.WriteLine();
             Console.WriteLine(prompt);
             Console.WriteLine("1) Add a Band to the Database");
-            Console.WriteLine("2) View all Bands in the Database");
-            Console.WriteLine("3) Add an Album for a Band in the Database");
-            Console.WriteLine("4) Add a Song to an Album in the Database");
-            Console.WriteLine("5) Cut a Band in the Database FROM the Label");
-            Console.WriteLine("6) Sign a Band in the Database TO the Label");
-            Console.WriteLine("7) View all of a specific Band's Albums");
-            Console.WriteLine("8) View all Albums in the Database (ordered by release date)");
-            Console.WriteLine("9) View all Bands that are signed to the Label");
-            Console.WriteLine("10) View all Bands that are NOT signed to the Label");
+            Console.WriteLine("2) Select a band by name");
+            Console.WriteLine("3) View all Bands in the Database");
+            Console.WriteLine("4) View all Albums in the Database (ordered by release date)");
+            Console.WriteLine("5) View all Bands that are signed to the Label");
+            Console.WriteLine("6) View all Bands that are NOT signed to the Label");
             Console.WriteLine("Type 0 to Exit the program.");
             string input;
             int value;
@@ -106,7 +93,6 @@ namespace RhythmsGonnaGetYou
             } while (!int.TryParse(input, out value));
             return value;
         }
-
         static void AddBand()
         {
             MenuGreeting("Adding a new Band. Please enter the following information about this new Band:");
@@ -146,6 +132,58 @@ namespace RhythmsGonnaGetYou
                 ContactPhoneNumber = newContactNumber,
             };
 
+            db.Bands.Add(newBand);
+            db.SaveChanges();
+        }
+
+        static void ViewBands()
+        {
+            MenuGreeting("Viewing all Bands:");
+            foreach (Band band in db.Bands)
+            {
+                Console.WriteLine($"{band.Name}");
+            }
+            Console.Write(">");
+            Console.ReadKey();
+        }
+
+        static void SelectBand()
+        {
+            MenuGreeting("Search for Band");
+
+            while (selectedBand == null)
+            {
+                var bandNameQuery = PromptForString("Band name to search for:");
+
+                // set selectBand by querying the DB for the band.
+                selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery));
+
+                if (selectedBand == null)
+                {
+                    Console.WriteLine($"No band found that matches \"{bandNameQuery}\".");
+                    if (WaitForKeyOrGoBack()) break;
+                }
+            }
+        }
+
+        static string PromptForString(string prompt)
+        {
+            Console.WriteLine();
+            Console.WriteLine(prompt);
+            Console.Write("> ");
+            return Console.ReadLine();
+        }
+
+        static bool WaitForKeyOrGoBack()
+        {
+            Console.WriteLine("Press (b) to go back or any key to continue.");
+            var key = Console.ReadKey();
+            if (key.Key == ConsoleKey.B)
+            {
+                Console.Clear();
+                return true;
+            }
+            return false;
         }
     }
 }
