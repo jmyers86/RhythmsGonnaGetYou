@@ -45,7 +45,18 @@ namespace RhythmsGonnaGetYou
                             ViewBands();
                             break;
 
-                        // TODO: Handle 4, 5, and 6
+                        case 4:
+                            ViewAlbums();
+                            break;
+
+                        case 5:
+                            ViewSignedBands();
+                            break;
+
+                        case 6:
+                            ViewNotSignedBands();
+                            break;
+
 
                         default:
                             Console.WriteLine(" Sorry, that is not a valid option.");
@@ -59,8 +70,34 @@ namespace RhythmsGonnaGetYou
                     {
                         Console.WriteLine($"{album.Title}");
                     }
-                    Console.WriteLine();
+                    var selection = BandMenuPrompt("Please make a selection from below:");
+                    switch (selection)
+                    {
+                        case 0:
+                            MenuGreeting("Main Menu");
+                            MainMenuPrompt("Please make a selection from below:");
+                            break;
 
+                        case 1:
+                            AddAlbum();
+                            break;
+
+                        case 2:
+                            AddSong();
+                            break;
+
+                        case 3:
+                            CutBand();
+                            break;
+
+                        case 4:
+                            ResignBand();
+                            break;
+
+                        default:
+                            Console.WriteLine(" Sorry, that is not a valid option.");
+                            break;
+                    }
                     // TODO: Handle these options:
                     //   AddAlbum();
                     //   AddSong();
@@ -135,18 +172,6 @@ namespace RhythmsGonnaGetYou
             db.Bands.Add(newBand);
             db.SaveChanges();
         }
-
-        static void ViewBands()
-        {
-            MenuGreeting("Viewing all Bands:");
-            foreach (Band band in db.Bands)
-            {
-                Console.WriteLine($"{band.Name}");
-            }
-            Console.Write(">");
-            Console.ReadKey();
-        }
-
         static void SelectBand()
         {
             MenuGreeting("Search for Band");
@@ -165,6 +190,94 @@ namespace RhythmsGonnaGetYou
                 }
             }
         }
+
+        static void ViewBands()
+        {
+            MenuGreeting("Viewing all Bands:");
+            foreach (Band band in db.Bands)
+            {
+                Console.WriteLine($"{band.Name}");
+            }
+            Console.Write(">");
+            Console.ReadKey();
+        }
+
+
+
+        static void ViewAlbums()
+        {
+            MenuGreeting("Viewing all Albums:");
+            var orderedAlbums = db.Albums.OrderBy(album => album.ReleaseDate);
+            Console.WriteLine($"{orderedAlbums}");
+            Console.Write(">");
+            Console.ReadKey();
+        }
+
+        static void ViewSignedBands()
+        {
+            MenuGreeting("Viewing all Signed Bands:");
+            foreach (Band band in db.Bands.Where(band => band.IsSigned == true))
+            {
+                Console.WriteLine($"{band.Name}");
+            }
+            Console.Write(">");
+            Console.ReadKey();
+        }
+
+        static void ViewNotSignedBands()
+        {
+            MenuGreeting("Viewing all Signed Bands:");
+            foreach (Band band in db.Bands.Where(band => band.IsSigned == false))
+            {
+                Console.WriteLine($"{band.Name}");
+            }
+            Console.Write(">");
+            Console.ReadKey();
+        }
+
+
+        static int BandMenuPrompt(string prompt)
+        {
+            Console.WriteLine(prompt);
+            Console.WriteLine("1) Add an Album for this Band");
+            Console.WriteLine("2) Add a Song to an Album in the Database");
+            Console.WriteLine("3) Cut a Band from the Label");
+            Console.WriteLine("4) Sign a Band to the Label");
+            Console.WriteLine();
+            Console.WriteLine(" Type '0' to return to Main Menu");
+            string input;
+            int value;
+            do
+            {
+                Console.Write(">");
+                input = Console.ReadLine();
+            } while (!int.TryParse(input, out value));
+            return value;
+        }
+
+        static void AddAlbum()
+        {
+            MenuGreeting("Adding a new Album. Please enter the following information about this new Album:");
+            Console.WriteLine("Album's title:");
+            var newAlbumTitle = Console.ReadLine();
+
+            Console.WriteLine("Is this Album explicit? (true or false)");
+            var newIsExplicit = bool.Parse(Console.ReadLine());
+
+            Console.WriteLine("Album's release date:");
+            var newReleaseDate = DateTime.Parse(Console.ReadLine());
+
+            var newAlbum = new Album()
+            {
+                Title = newAlbumTitle,
+                IsExplicit = newIsExplicit,
+                ReleaseDate = newReleaseDate,
+            };
+
+            db.Albums.Add(newAlbum);
+            db.SaveChanges();
+        }
+
 
         static string PromptForString(string prompt)
         {
