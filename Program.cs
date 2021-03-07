@@ -46,7 +46,7 @@ namespace RhythmsGonnaGetYou
                             break;
 
                         case 4:
-                            ViewAlbums();
+                            ViewAllAlbums();
                             break;
 
                         case 5:
@@ -77,34 +77,34 @@ namespace RhythmsGonnaGetYou
                         case 0:
                             selectedBand = null;
                             break;
-                        // I want to return to the main menu when pressing a certain key.
-                        // I tried adding "selectedBand = null;"  and several other things.
-                        // I can't get the WaitForKeyOrGoBack method to work here either.
+                        // I cut the WaitForKeyOrGoBack because I couldn't figure out how to fit it into this switch statement.
+                        // It ended up asking you to "press 0" and then running the WaitFor... method which felt redundant.
+
                         case 1:
                             AddAlbum();
                             break;
 
-                        // case 2:
-                        //     AddSong();
-                        //     break;
+                        case 2:
+                            AddSong();
+                            break;
 
-                        // case 3:
-                        //     CutBand();
-                        //     break;
+                        case 3:
+                            CutBand();
+                            break;
 
-                        // case 4:
-                        //     ResignBand();
-                        //     break;
+                        case 4:
+                            ResignBand();
+                            break;
 
                         default:
                             Console.WriteLine(" Sorry, that is not a valid option.");
                             break;
                     }
 
-                    // if (WaitForKeyOrGoBack())
-                    // {
-                    //     selectedBand = null;
-                    // }
+                    if (WaitForKeyOrGoBack())
+                    {
+                        selectedBand = null;
+                    }
                 }
             }
         }
@@ -201,7 +201,7 @@ namespace RhythmsGonnaGetYou
 
 
 
-        static void ViewAlbums()
+        static void ViewAllAlbums()
         {
             MenuGreeting("Viewing all Albums:");
             // var orderedAlbums = db.Albums.OrderBy(Album => Album.ReleaseDate);
@@ -241,9 +241,9 @@ namespace RhythmsGonnaGetYou
         {
             Console.WriteLine(prompt);
             Console.WriteLine("1) Add an Album for this Band");
-            Console.WriteLine("2) Add a Song to an Album in the Database");
-            Console.WriteLine("3) Cut a Band from the Label");
-            Console.WriteLine("4) Sign a Band to the Label");
+            Console.WriteLine("2) Add a Song to one of this Band's Albums");
+            Console.WriteLine("3) Cut this Band from the Label");
+            Console.WriteLine("4) Sign this Band to the Label");
             Console.WriteLine();
             Console.WriteLine(" Type '0' to exit Band Menu");
             string input;
@@ -279,6 +279,27 @@ namespace RhythmsGonnaGetYou
             db.SaveChanges();
         }
 
+        static void AddSong()  // This one is very difficult for me and I had to do a PEDAC for it. Still not getting it.
+        {
+            MenuGreeting("Please choose the Album you would like to add a song to:");
+
+
+        }
+
+        static void CutBand()   // This does nothing. It should at least print something. 
+        {
+            if (selectedBand.IsSigned == true)
+            {
+                Console.WriteLine($"{selectedBand} was let go from the Label!");
+
+            }
+            else Console.WriteLine($"{selectedBand} is not signed to the Label!");
+        }
+
+        static void ResignBand()
+        {
+
+        }
 
         static string PromptForString(string prompt)
         {
