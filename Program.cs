@@ -75,6 +75,7 @@ namespace RhythmsGonnaGetYou
                     switch (selection)
                     {
                         case 0:
+                            selectedBand = null;
                             break;
                         // I want to return to the main menu when pressing a certain key.
                         // I tried adding "selectedBand = null;"  and several other things.
@@ -100,10 +101,10 @@ namespace RhythmsGonnaGetYou
                             break;
                     }
 
-                    if (WaitForKeyOrGoBack())
-                    {
-                        selectedBand = null;
-                    }
+                    // if (WaitForKeyOrGoBack())
+                    // {
+                    //     selectedBand = null;
+                    // }
                 }
             }
         }
@@ -203,8 +204,12 @@ namespace RhythmsGonnaGetYou
         static void ViewAlbums()
         {
             MenuGreeting("Viewing all Albums:");
-            var orderedAlbums = db.Albums.OrderBy(album => album.ReleaseDate);
-            Console.WriteLine($"{orderedAlbums}");
+            // var orderedAlbums = db.Albums.OrderBy(Album => Album.ReleaseDate);
+            // Console.WriteLine($"{orderedAlbums}");   <---- I don't know why this doesn't work.
+            foreach (Album album in db.Albums.OrderBy(album => album.ReleaseDate))
+            {
+                Console.WriteLine($"{album.Title} , {album.ReleaseDate}");
+            }
             Console.Write(">");
             Console.ReadKey();
         }
@@ -240,7 +245,7 @@ namespace RhythmsGonnaGetYou
             Console.WriteLine("3) Cut a Band from the Label");
             Console.WriteLine("4) Sign a Band to the Label");
             Console.WriteLine();
-            Console.WriteLine(" Type '0' to return to Main Menu");
+            Console.WriteLine(" Type '0' to exit Band Menu");
             string input;
             int value;
             do
@@ -260,9 +265,9 @@ namespace RhythmsGonnaGetYou
             Console.WriteLine("Is this Album explicit? (true or false)");
             var newIsExplicit = bool.Parse(Console.ReadLine());
 
-            Console.WriteLine("Album's release date:");
-            var newReleaseDate = DateTime.Parse(Console.ReadLine());
-
+            Console.WriteLine("Album's release date (DD/MM/YYYY):");
+            var newReleaseDate = DateTime.Parse(Console.ReadLine());   //This input is too particular and crashes the program if the format is not correct. I tried to implement a try/catch
+                                                                       // or tryparse but I couldn't make it work.
             var newAlbum = new Album()
             {
                 Title = newAlbumTitle,
@@ -270,7 +275,7 @@ namespace RhythmsGonnaGetYou
                 ReleaseDate = newReleaseDate,
             };
 
-            db.Albums.Add(newAlbum);
+            selectedBand.Albums.Add(newAlbum);
             db.SaveChanges();
         }
 
