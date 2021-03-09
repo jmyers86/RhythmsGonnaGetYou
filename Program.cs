@@ -169,7 +169,7 @@ namespace RhythmsGonnaGetYou
             db.Bands.Add(newBand);
             db.SaveChanges();
         }
-        static void SelectBand()
+        static void SelectBand()   //<-- I want to store the selected band for future use in the nested BandMenu. Maybe a context.SaveChanges(); ?
         {
             MenuGreeting("Search for Band");
 
@@ -179,6 +179,7 @@ namespace RhythmsGonnaGetYou
 
                 // The way this is written only allows fully lower-case queries.
                 selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery));
+                db.SaveChanges();
 
                 if (selectedBand == null)
                 {
@@ -187,6 +188,8 @@ namespace RhythmsGonnaGetYou
                 }
             }
         }
+
+
 
         static void ViewBands()
         {
@@ -279,17 +282,40 @@ namespace RhythmsGonnaGetYou
             db.SaveChanges();
         }
 
-        static void AddSong()  // This one is very difficult for me and I had to do a PEDAC for it. Still not getting it.
+        static void AddSong()  // This one is very difficult for me. The nested menu system is confusing.
         {
-            MenuGreeting("Please choose the Album you would like to add a song to:");
+            MenuGreeting("Please choose the Album you would like to add a song to:"); //<-- I would like to store the user's choice like the BandMenu.
+
+            Console.WriteLine("What is the title of this Song?");
+            var newTitle = Console.ReadLine();
+
+            Console.WriteLine("Which track number is this Song?");
+            var newTrackNumber = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("How long (in seconds) is this track?");
+            var newDuration = int.Parse(Console.ReadLine());
+
+            var songs = db.Albums.Include(albums => albums.Songs);
+
+            var newSong = new Song()
+            {
+                Title = newTitle,
+                TrackNumber = newTrackNumber,
+                Duration = newDuration,
+            };
+
+
+            db.Albums.Add(newSong);
+            db.SaveChanges();
 
 
         }
 
-        static void CutBand()   // This does nothing. It should at least print something. 
+        static void CutBand()   // This does not call the selectedBand. I don't know why. 
         {
             if (selectedBand.IsSigned == true)
             {
+                selectedBand.IsSigned = false;
                 Console.WriteLine($"{selectedBand} was let go from the Label!");
 
             }
@@ -298,7 +324,13 @@ namespace RhythmsGonnaGetYou
 
         static void ResignBand()
         {
+            if (selectedBand.IsSigned == false)
+            {
+                selectedBand.IsSigned = true;
+                Console.WriteLine($"{selectedBand} was signed to the Label!");
 
+            }
+            else Console.WriteLine($"{selectedBand} is already signed to the Label!");
         }
 
         static string PromptForString(string prompt)
