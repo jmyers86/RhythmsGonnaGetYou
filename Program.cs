@@ -178,8 +178,7 @@ namespace RhythmsGonnaGetYou
                 var bandNameQuery = PromptForString("Band name to search for:");
 
                 // The way this is written only allows fully lower-case queries.
-                selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery));
-                db.SaveChanges();
+                selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery.ToLower()));
 
                 if (selectedBand == null)
                 {
@@ -269,8 +268,17 @@ namespace RhythmsGonnaGetYou
             var newIsExplicit = bool.Parse(Console.ReadLine());
 
             Console.WriteLine("Album's release date (DD/MM/YYYY):");
-            var newReleaseDate = DateTime.Parse(Console.ReadLine());   //This input is too particular and crashes the program if the format is not correct. I tried to implement a try/catch
-                                                                       // or tryparse but I couldn't make it work.
+            DateTime newReleaseDate = DateTime.Today;
+            try
+            {
+                newReleaseDate = DateTime.Parse(Console.ReadLine());
+            }
+            catch (System.FormatException)
+            {
+                Console.WriteLine("Not a valid date format. Returning to Band Menu.");
+                return;
+            };
+
             var newAlbum = new Album()
             {
                 Title = newAlbumTitle,
@@ -286,6 +294,13 @@ namespace RhythmsGonnaGetYou
         {
             MenuGreeting("Please choose the Album you would like to add a song to:"); //<-- I would like to store the user's choice like the BandMenu.
 
+            Album selectedAlbum = null;
+
+            while (selectedAlbum == null)
+            {
+                var albumQuery = PromptForString("Please choose the Album you would like to add a song to:");
+                selectedAlbum = selectedBand.Albums.FirstOrDefault(album => album.Title.ToLower().Contains(albumQuery.ToLower()));
+            }
             Console.WriteLine("What is the title of this Song?");
             var newTitle = Console.ReadLine();
 
@@ -295,31 +310,31 @@ namespace RhythmsGonnaGetYou
             Console.WriteLine("How long (in seconds) is this track?");
             var newDuration = int.Parse(Console.ReadLine());
 
-            var songs = db.Albums.Include(albums => albums.Songs);
-
             var newSong = new Song()
             {
+                Album = selectedAlbum,   // This saves 'selectedAlbum' to the album ID
                 Title = newTitle,
                 TrackNumber = newTrackNumber,
                 Duration = newDuration,
             };
 
 
-            db.Albums.Add(newSong);
+            db.Songs.Add(newSong);
             db.SaveChanges();
 
 
         }
 
-        static void CutBand()   // This does not call the selectedBand. I don't know why. 
+        static void CutBand()
         {
             if (selectedBand.IsSigned == true)
             {
                 selectedBand.IsSigned = false;
-                Console.WriteLine($"{selectedBand} was let go from the Label!");
+                Console.WriteLine($"{selectedBand.Name} was let go from the Label!");
+                db.SaveChanges();
 
             }
-            else Console.WriteLine($"{selectedBand} is not signed to the Label!");
+            else Console.WriteLine($"{selectedBand.Name} is not signed to the Label!");
         }
 
         static void ResignBand()
@@ -327,10 +342,11 @@ namespace RhythmsGonnaGetYou
             if (selectedBand.IsSigned == false)
             {
                 selectedBand.IsSigned = true;
-                Console.WriteLine($"{selectedBand} was signed to the Label!");
+                Console.WriteLine($"{selectedBand.Name} was signed to the Label!");
+                db.SaveChanges();
 
             }
-            else Console.WriteLine($"{selectedBand} is already signed to the Label!");
+            else Console.WriteLine($"{selectedBand.Name} is already signed to the Label!");
         }
 
         static string PromptForString(string prompt)
