@@ -77,8 +77,6 @@ namespace RhythmsGonnaGetYou
                         case 0:
                             selectedBand = null;
                             break;
-                        // I cut the WaitForKeyOrGoBack because I couldn't figure out how to fit it into this switch statement.
-                        // It ended up asking you to "press 0" and then running the WaitFor... method which felt redundant.
 
                         case 1:
                             AddAlbum();
@@ -169,7 +167,7 @@ namespace RhythmsGonnaGetYou
             db.Bands.Add(newBand);
             db.SaveChanges();
         }
-        static void SelectBand()   //<-- I want to store the selected band for future use in the nested BandMenu. Maybe a context.SaveChanges(); ?
+        static void SelectBand()
         {
             MenuGreeting("Search for Band");
 
@@ -177,7 +175,6 @@ namespace RhythmsGonnaGetYou
             {
                 var bandNameQuery = PromptForString("Band name to search for:");
 
-                // The way this is written only allows fully lower-case queries.
                 selectedBand = db.Bands.Include(band => band.Albums).FirstOrDefault(band => band.Name.ToLower().Contains(bandNameQuery.ToLower()));
 
                 if (selectedBand == null)
@@ -206,8 +203,6 @@ namespace RhythmsGonnaGetYou
         static void ViewAllAlbums()
         {
             MenuGreeting("Viewing all Albums:");
-            // var orderedAlbums = db.Albums.OrderBy(Album => Album.ReleaseDate);
-            // Console.WriteLine($"{orderedAlbums}");   <---- I don't know why this doesn't work.
             foreach (Album album in db.Albums.OrderBy(album => album.ReleaseDate))
             {
                 Console.WriteLine($"{album.Title} , {album.ReleaseDate}");
@@ -290,10 +285,9 @@ namespace RhythmsGonnaGetYou
             db.SaveChanges();
         }
 
-        static void AddSong()  // This one is very difficult for me. The nested menu system is confusing.
+        static void AddSong()
         {
-            MenuGreeting("Please choose the Album you would like to add a song to:"); //<-- I would like to store the user's choice like the BandMenu.
-
+            MenuGreeting("Please choose the Album you would like to add a song to:");
             Album selectedAlbum = null;
 
             while (selectedAlbum == null)
